@@ -6,17 +6,40 @@ pub struct Peak<T> {
     pub max: T,
 }
 
-pub trait SlicePeakExt {
+pub trait SlicePeakExt: Sized {
     type Item;
 
-    /// Returns the highest and lowest elements in this slice according to [`Peakable`]
+    /// Returns the highest and lowest elements in this slice.
+    ///
+    /// This will use [`SlicePeakExt::peak_avx2`] if available or fall back to [`SlicePeakExt::peak_naive`].
+    /// When you know that your chunks are not larger than 15 elements,
+    /// calling [`SlicePeakExt::peak_naive`] directly might be better.
     ///
     /// # Example
     ///
     /// ```ignore
     /// samples.chunks(4).map(SlicePeakExt::peak)
     /// ```
-    fn peak(self) -> Peak<Self::Item>;
+    fn peak(self) -> Peak<Self::Item> {
+        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+        if is_x86_feature_detected!("avx2") {
+            return Self::peak_avx2(self);
+        }
+        Self::peak_naive(self)
+    }
+
+    /// Returns the highest and lowest elements in this slice.
+    ///
+    /// The implementation is optimized with AVX2's 8xf32 SIMD instructions,
+    /// but only has a real performance gain for chunks of 16 elements or more.
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    fn peak_avx2(self) -> Peak<Self::Item>;
+
+    /// Returns the highest and lowest elements in this slice.
+    ///
+    /// The implementation is naive and not optimized,
+    /// but can still perform better on small chunks when used directly.
+    fn peak_naive(self) -> Peak<Self::Item>;
 }
 
 #[cfg(test)]
