@@ -22,6 +22,14 @@ fn bench_peak_f32(c: &mut Criterion) {
         b.iter(|| SlicePeakExt::peak_naive(i))
     });
 
+    let i: &[f32] = &[0; 64 * 1024].map(|_| rng.gen_range(-50.0..50.0));
+    group.bench_with_input(BenchmarkId::new("Large - AVX2", 64 * 1024), i, |b, i| {
+        b.iter(|| SlicePeakExt::peak_avx2(i))
+    });
+    group.bench_with_input(BenchmarkId::new("Large - Naive", 64 * 1024), i, |b, i| {
+        b.iter(|| SlicePeakExt::peak_naive(i))
+    });
+
     group.finish();
 }
 
