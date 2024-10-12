@@ -24,16 +24,18 @@ impl SlicePeakExt for &[f32] {
             max = unsafe { _mm256_max_ps(max, samples) };
         }
 
+        #[repr(align(32))]
+        struct SIMD([f32; 8]);
+
         let min = unsafe {
-            let mut array: MaybeUninit<[f32; 8]> = MaybeUninit::uninit();
-            // TODO: make array aligned correctly so we can use store instead
-            _mm256_storeu_ps(array.as_mut_ptr().cast(), min);
-            array.assume_init()
+            let mut array: MaybeUninit<SIMD> = MaybeUninit::uninit();
+            _mm256_store_ps(array.as_mut_ptr().cast(), min);
+            array.assume_init().0
         };
         let max = unsafe {
-            let mut array: MaybeUninit<[f32; 8]> = MaybeUninit::uninit();
-            _mm256_storeu_ps(array.as_mut_ptr().cast(), max);
-            array.assume_init()
+            let mut array: MaybeUninit<SIMD> = MaybeUninit::uninit();
+            _mm256_store_ps(array.as_mut_ptr().cast(), max);
+            array.assume_init().0
         };
 
         return Peak {
