@@ -22,14 +22,11 @@ impl SlicePeakExt for &[f32] {
                 let mut max = unsafe { _mm256_setzero_ps() };
 
                 for block in blocks {
-                    let hiaddr = block.as_ptr();
-                    let loaddr = unsafe { hiaddr.offset(4) };
-                    let samples = unsafe { _mm256_loadu2_m128(hiaddr, loaddr) };
+                    let samples = unsafe { _mm256_load_ps(block.as_ptr()) };
                     min = unsafe { _mm256_min_ps(min, samples) };
                     max = unsafe { _mm256_max_ps(max, samples) };
                 }
 
-                // TODO: validate that it works on both endians
                 let min = unsafe {
                     let mut array: MaybeUninit<[f32; 8]> = MaybeUninit::uninit();
                     _mm256_store_ps(array.as_mut_ptr().cast(), min);
