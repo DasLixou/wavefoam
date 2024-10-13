@@ -8,11 +8,3 @@ bikeshedwaveform_iced = { path = "iced", optional = true }
 
 [features]
 iced = ["dep:bikeshedwaveform_iced"]
-
-[dev-dependencies]
-criterion = "0.5.1"
-rand = "0.8.5"
-
-[[bench]]
-name = "peaks_f32"
-harness = false
