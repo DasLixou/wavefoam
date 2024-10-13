@@ -1,11 +1,9 @@
 use super::{Peak, PeakExt};
 use crate::utils::IterExt as _;
 
-impl PeakExt for [f32] {
-    type Item = f32;
-
-    fn peak(&self) -> Option<Peak<Self::Item>> {
-        self.into_iter().copied().reduce_with(
+impl PeakExt for f32 {
+    fn peak(slice: &[Self]) -> Option<Peak<Self>> {
+        slice.into_iter().copied().reduce_with(
             |sample| Peak {
                 min: sample,
                 max: sample,

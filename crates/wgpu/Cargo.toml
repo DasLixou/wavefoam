@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 bikeshedwaveform_core = { path = "../core" }
+wgpu = "22.1.0"

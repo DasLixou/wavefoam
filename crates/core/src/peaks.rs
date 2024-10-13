@@ -6,17 +6,15 @@ pub struct Peak<T> {
     pub max: T,
 }
 
-pub trait PeakExt {
-    type Item;
-
-    /// Returns the highest and lowest elements in this slice.
+pub trait PeakExt: Sized {
+    /// Returns the highest and lowest elements in the slice.
     ///
     /// # Example
     ///
     /// ```ignore
     /// samples.chunks(4).map(SlicePeakExt::peak)
     /// ```
-    fn peak(&self) -> Option<Peak<Self::Item>>;
+    fn peak(slice: &[Self]) -> Option<Peak<Self>>;
 }
 
 #[cfg(test)]
