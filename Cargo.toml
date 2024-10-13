@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bikeshedwaveform_iced = { path = "iced", optional = true }
+
+[features]
+iced = ["dep:bikeshedwaveform_iced"]
 
 [dev-dependencies]
 criterion = "0.5.1"

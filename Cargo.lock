@@ -33,9 +33,14 @@ checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 name = "bikeshedwaveform"
 version = "0.1.0"
 dependencies = [
+ "bikeshedwaveform_iced",
  "criterion",
  "rand",
 ]
+
+[[package]]
+name = "bikeshedwaveform_iced"
+version = "0.1.0"
 
 [[package]]
 name = "bumpalo"
