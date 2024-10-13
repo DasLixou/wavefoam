@@ -1,14 +1,19 @@
 use super::{Peak, SlicePeakExt};
+use crate::utils::IterExt as _;
 
 impl SlicePeakExt for &[f32] {
     type Item = f32;
 
-    fn peak(self) -> Peak<Self::Item> {
-        // TODO: think about default - when it's between 2. and 5., min would still be 0
-        self.into_iter()
-            .fold(Peak::default(), |peak, &sample| Peak {
+    fn peak(self) -> Option<Peak<Self::Item>> {
+        self.into_iter().copied().reduce_with(
+            |sample| Peak {
+                min: sample,
+                max: sample,
+            },
+            |peak, sample| Peak {
                 min: sample.min(peak.min),
                 max: sample.max(peak.max),
-            })
+            },
+        )
     }
 }
