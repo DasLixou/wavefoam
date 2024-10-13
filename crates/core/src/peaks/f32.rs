@@ -1,10 +1,10 @@
-use super::{Peak, SlicePeakExt};
+use super::{Peak, PeakExt};
 use crate::utils::IterExt as _;
 
-impl SlicePeakExt for &[f32] {
+impl PeakExt for [f32] {
     type Item = f32;
 
-    fn peak(self) -> Option<Peak<Self::Item>> {
+    fn peak(&self) -> Option<Peak<Self::Item>> {
         self.into_iter().copied().reduce_with(
             |sample| Peak {
                 min: sample,

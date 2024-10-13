@@ -6,7 +6,7 @@ pub struct Peak<T> {
     pub max: T,
 }
 
-pub trait SlicePeakExt: Sized {
+pub trait PeakExt {
     type Item;
 
     /// Returns the highest and lowest elements in this slice.
@@ -16,17 +16,17 @@ pub trait SlicePeakExt: Sized {
     /// ```ignore
     /// samples.chunks(4).map(SlicePeakExt::peak)
     /// ```
-    fn peak(self) -> Option<Peak<Self::Item>>;
+    fn peak(&self) -> Option<Peak<Self::Item>>;
 }
 
 #[cfg(test)]
 mod test {
-    use crate::peaks::{Peak, SlicePeakExt};
+    use crate::peaks::{Peak, PeakExt};
 
     #[test]
     fn peak_8() {
         let samples: &[f32] = &[0.0, 1.4, -3.4, 2.1, -1.3, 5.3, 2.1, 0.9];
-        let peak = SlicePeakExt::peak(samples);
+        let peak = PeakExt::peak(samples);
 
         assert_eq!(
             peak,
@@ -40,7 +40,7 @@ mod test {
     #[test]
     fn only_positive() {
         let samples: &[f32] = &[1.4, 2.1, 5.3, 2.1, 0.9];
-        let peak = SlicePeakExt::peak(samples);
+        let peak = PeakExt::peak(samples);
 
         assert_eq!(peak, Some(Peak { min: 0.9, max: 5.3 }));
     }
