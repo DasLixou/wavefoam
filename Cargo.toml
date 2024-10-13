@@ -1,10 +1,17 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
 [package]
 name = "bikeshedwaveform"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bikeshedwaveform_iced = { path = "iced", optional = true }
+bikeshedwaveform_core = { path = "crates/core" }
+bikeshedwaveform_iced = { path = "crates/iced", optional = true }
+bikeshedwaveform_wgpu = { path = "crates/wgpu", optional = true }
 
 [features]
-iced = ["dep:bikeshedwaveform_iced"]
+iced = ["dep:bikeshedwaveform_iced", "wgpu"]
+wgpu = ["dep:bikeshedwaveform_wgpu"]

@@ -1,0 +1,8 @@
+[package]
+name = "bikeshedwaveform_iced"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bikeshedwaveform_core = { path = "../core" }
+bikeshedwaveform_wgpu = { path = "../wgpu" }

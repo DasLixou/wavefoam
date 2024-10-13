@@ -6,9 +6,26 @@ version = 3
 name = "bikeshedwaveform"
 version = "0.1.0"
 dependencies = [
+ "bikeshedwaveform_core",
  "bikeshedwaveform_iced",
+ "bikeshedwaveform_wgpu",
 ]
+
+[[package]]
+name = "bikeshedwaveform_core"
+version = "0.1.0"
 
 [[package]]
 name = "bikeshedwaveform_iced"
 version = "0.1.0"
+dependencies = [
+ "bikeshedwaveform_core",
+ "bikeshedwaveform_wgpu",
+]
+
+[[package]]
+name = "bikeshedwaveform_wgpu"
+version = "0.1.0"
+dependencies = [
+ "bikeshedwaveform_core",
+]
