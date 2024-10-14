@@ -20,16 +20,16 @@ fn vs_main(
 
 @group(0) @binding(0)
 var tex: texture_1d<f32>;
-@group(0) @binding(0)
+@group(0) @binding(1)
 var smplr: sampler;
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let sample = textureSample(tex, smplr, in.uv.x).xy;
-    let v = (in.uv.y - 0.5) * 16000; // TODO: do we want max f32 here?
+    let v = (in.uv.y - 0.5); // TODO: do we want max f32 here?
     if v < sample.y && v > sample.x {
-        vec4<f32>(0.5, 0.6, 0.8, 1.0)
+        return vec4<f32>(0.5, 0.6, 0.8, 1.0);
     } else {
-        vec4<f32>(0.0, 0.0, 0.0, 0.0)
+        return vec4<f32>(0.0, 0.0, 0.0, 0.0);
     }
 }

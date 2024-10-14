@@ -1,6 +1,8 @@
 use std::ops::Deref;
 
 use bikeshedwaveform_core::peaks::{Peak, PeakExt};
+use bytemuck::Pod;
+use itertools::Itertools;
 use wgpu::{Extent3d, Queue, Texture, TextureDescriptor, TextureFormat, TextureUsages};
 
 pub struct PeakTexture<T: PeakDesc> {
@@ -10,18 +12,18 @@ pub struct PeakTexture<T: PeakDesc> {
 impl<T: PeakDesc> PeakTexture<T> {
     const FORMAT: TextureFormat = T::FORMAT;
 
-    pub fn from_slice(slice: &[T], chunk_size: usize) -> Self
+    pub fn from_stream(iter: impl Itertools<Item = T>, chunk_size: usize) -> Self
     where
         T: PeakExt + Default,
     {
-        Self::from_iterator(
-            slice
-                .chunks(chunk_size)
+        Self::from_chunks(
+            iter.chunks(chunk_size)
+                .into_iter()
                 .map(|chunk| PeakExt::peak(chunk).unwrap_or_default()),
         )
     }
 
-    pub fn from_iterator(iter: impl Iterator<Item = Peak<T>>) -> Self {
+    pub fn from_chunks(iter: impl Iterator<Item = Peak<T>>) -> Self {
         Self {
             data: iter.collect(),
         }
@@ -48,7 +50,10 @@ impl<T: PeakDesc> PeakTexture<T> {
         }
     }
 
-    pub fn queue_texture_write(&self, queue: &Queue, texture: &Texture) {
+    pub fn queue_texture_write(&self, queue: &Queue, texture: &Texture)
+    where
+        Peak<T>: Pod,
+    {
         queue.write_texture(
             wgpu::ImageCopyTexture {
                 texture,
@@ -56,13 +61,10 @@ impl<T: PeakDesc> PeakTexture<T> {
                 origin: wgpu::Origin3d::ZERO,
                 aspect: wgpu::TextureAspect::All,
             },
-            unsafe {
-                let data: &[Peak<T>] = self.data.deref();
-                core::mem::transmute(data)
-            },
+            bytemuck::cast_slice(&self.data),
             wgpu::ImageDataLayout {
                 offset: 0,
-                bytes_per_row: None,
+                bytes_per_row: Some(8 * self.data.len() as u32),
                 rows_per_image: None,
             },
             self.texture_size(),

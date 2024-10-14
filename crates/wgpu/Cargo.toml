@@ -5,4 +5,11 @@ edition = "2021"
 
 [dependencies]
 bikeshedwaveform_core = { path = "../core" }
+itertools = "0.13.0"
 wgpu = "22.1.0"
+bytemuck = { version = "1.19.0", features = ["derive"] }
+
+[dev-dependencies]
+hound = "3.5.1"
+pollster = "0.3.0"
+winit = "0.30.5"
