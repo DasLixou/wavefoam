@@ -4,4 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bytemuck = { version = "1.19.0", features = ["derive"] }
+bytemuck = { version = "1.19.0", features = ["derive"], optional = true }
+
+[features]
+bytemuck = ["dep:bytemuck"]

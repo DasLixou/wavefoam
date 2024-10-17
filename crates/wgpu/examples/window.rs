@@ -125,7 +125,7 @@ impl ApplicationHandler for App<'_> {
         let wav_reader = WavReader::new(sample.as_slice()).unwrap();
         assert_eq!(wav_reader.spec().sample_format, SampleFormat::Float);
         let peak_texture =
-            PeakTexture::from_stream(wav_reader.into_samples::<f32>().map(Result::unwrap), 256);
+            PeakTexture::from_iter(wav_reader.into_samples::<f32>().map(Result::unwrap), 256);
         let tex = device.create_texture(&peak_texture.texture_descriptor());
         peak_texture.queue_texture_write(&queue, &tex);
         let tex_view = tex.create_view(&wgpu::TextureViewDescriptor::default());

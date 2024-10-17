@@ -1,29 +1,23 @@
-use std::ops::Deref;
-
-use bikeshedwaveform_core::peaks::{Peak, PeakExt};
-use bytemuck::Pod;
+use bikeshedwaveform_core::peaks::Peak;
 use itertools::Itertools;
 use wgpu::{Extent3d, Queue, Texture, TextureDescriptor, TextureFormat, TextureUsages};
 
-pub struct PeakTexture<T: PeakDesc> {
-    data: Box<[Peak<T>]>,
+pub struct PeakTexture {
+    data: Box<[Peak]>,
 }
 
-impl<T: PeakDesc> PeakTexture<T> {
-    const FORMAT: TextureFormat = T::FORMAT;
+impl PeakTexture {
+    const FORMAT: TextureFormat = TextureFormat::Rg32Float; // TODO: do we just want 16-bit? Should user be able to decide?
 
-    pub fn from_stream(iter: impl Itertools<Item = T>, chunk_size: usize) -> Self
-    where
-        T: PeakExt + Default,
-    {
+    pub fn from_iter(iter: impl Itertools<Item = f32>, chunk_size: usize) -> Self {
         Self::from_chunks(
             iter.chunks(chunk_size)
                 .into_iter()
-                .map(|chunk| PeakExt::peak(chunk).unwrap_or_default()),
+                .map(|chunk| Peak::from_iter(chunk).unwrap_or_default()),
         )
     }
 
-    pub fn from_chunks(iter: impl Iterator<Item = Peak<T>>) -> Self {
+    pub fn from_chunks(iter: impl Iterator<Item = Peak>) -> Self {
         Self {
             data: iter.collect(),
         }
@@ -50,10 +44,7 @@ impl<T: PeakDesc> PeakTexture<T> {
         }
     }
 
-    pub fn queue_texture_write(&self, queue: &Queue, texture: &Texture)
-    where
-        Peak<T>: Pod,
-    {
+    pub fn queue_texture_write(&self, queue: &Queue, texture: &Texture) {
         queue.write_texture(
             wgpu::ImageCopyTexture {
                 texture,
@@ -70,12 +61,4 @@ impl<T: PeakDesc> PeakTexture<T> {
             self.texture_size(),
         );
     }
-}
-
-pub trait PeakDesc {
-    const FORMAT: TextureFormat;
-}
-
-impl PeakDesc for f32 {
-    const FORMAT: TextureFormat = TextureFormat::Rg32Float; // TODO: do we just want 16-bit? Should user be able to decide?
 }
