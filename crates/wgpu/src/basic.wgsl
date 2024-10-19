@@ -23,18 +23,19 @@ var tex: texture_1d<f32>;
 @group(0) @binding(1)
 var smplr: sampler;
 @group(0) @binding(2)
-var<uniform> resolution: f32;
+var<uniform> resolution: u32;
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    let texel_size = 1.0 / resolution;
+    let texel_size = 1.0 / f32(resolution);
 
-    let fragment_size = fwidth(in.uv.x);
+    let fragment_size = abs(dpdxFine(in.uv.x));
 
-    var texel_pos = in.uv.x - 0.5 * fragment_size;
-    let texel_max = in.uv.x + 0.5 * fragment_size;
+    var texel_pos = in.uv.x - (0.5 * fragment_size);
+    let texel_max = in.uv.x + (0.5 * fragment_size);
 
     var peak = textureSample(tex, smplr, texel_pos).xy;
+    texel_pos += texel_size;
     while texel_pos < texel_max {
         let sample = textureSample(tex, smplr, texel_pos);
         peak = vec2<f32>(min(peak.x, sample.x), max(peak.y, sample.y));
@@ -45,6 +46,6 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     if v < peak.y && v > peak.x {
         return vec4<f32>(0.5, 0.6, 0.8, 1.0);
     } else {
-        return vec4<f32>(0.0, 0.0, 0.0, 0.0);
+        discard;
     }
 }
