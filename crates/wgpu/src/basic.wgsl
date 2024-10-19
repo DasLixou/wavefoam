@@ -22,12 +22,27 @@ fn vs_main(
 var tex: texture_1d<f32>;
 @group(0) @binding(1)
 var smplr: sampler;
+@group(0) @binding(2)
+var<uniform> resolution: f32;
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    let sample = textureSample(tex, smplr, in.uv.x).xy;
-    let v = (in.uv.y - 0.5); // TODO: do we want max f32 here?
-    if v < sample.y && v > sample.x {
+    let texel_size = 1.0 / resolution;
+
+    let fragment_size = fwidth(in.uv.x);
+
+    var texel_pos = in.uv.x - 0.5 * fragment_size;
+    let texel_max = in.uv.x + 0.5 * fragment_size;
+
+    var peak = textureSample(tex, smplr, texel_pos).xy;
+    while texel_pos < texel_max {
+        let sample = textureSample(tex, smplr, texel_pos);
+        peak = vec2<f32>(min(peak.x, sample.x), max(peak.y, sample.y));
+        texel_pos += texel_size;
+    }
+
+    let v = in.uv.y - 0.5;
+    if v < peak.y && v > peak.x {
         return vec4<f32>(0.5, 0.6, 0.8, 1.0);
     } else {
         return vec4<f32>(0.0, 0.0, 0.0, 0.0);

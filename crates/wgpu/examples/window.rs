@@ -3,7 +3,8 @@ use std::{error::Error, sync::Arc};
 use bikeshedwaveform_wgpu::peak_texture::PeakTexture;
 use hound::{SampleFormat, WavReader};
 use wgpu::{
-    util::DeviceExt, BlendState, Color, ColorWrites, MultisampleState, PipelineCompilationOptions,
+    util::{BufferInitDescriptor, DeviceExt},
+    BlendState, Color, ColorWrites, MultisampleState, PipelineCompilationOptions,
     PipelineLayoutDescriptor, ShaderModuleDescriptor, TextureUsages, TextureViewDescriptor,
 };
 use winit::{
@@ -139,6 +140,12 @@ impl ApplicationHandler for App<'_> {
             ..Default::default()
         });
 
+        let resolution_buffer = device.create_buffer_init(&BufferInitDescriptor {
+            label: Some("Wavefoam Texture Resolution"),
+            contents: bytemuck::cast_slice(&[peak_texture.texture_size().width]),
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+
         let peak_bind_group_layout =
             device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
                 entries: &[
@@ -160,6 +167,16 @@ impl ApplicationHandler for App<'_> {
                         ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::NonFiltering),
                         count: None,
                     },
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 2,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Buffer {
+                            ty: wgpu::BufferBindingType::Uniform,
+                            has_dynamic_offset: false,
+                            min_binding_size: None,
+                        },
+                        count: None,
+                    },
                 ],
                 label: Some("texture_bind_group_layout"),
             });
@@ -175,6 +192,10 @@ impl ApplicationHandler for App<'_> {
                 wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::Sampler(&sampler),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: resolution_buffer.as_entire_binding(),
                 },
             ],
         });
@@ -247,6 +268,7 @@ impl ApplicationHandler for App<'_> {
             render_pipeline,
             vertex_buffer,
             index_buffer,
+            resolution_buffer,
             peak_bind_group,
             window,
         })
@@ -336,6 +358,7 @@ struct ActiveRenderState<'a> {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
+    resolution_buffer: wgpu::Buffer,
     peak_bind_group: wgpu::BindGroup,
     window: Arc<Window>,
 }
