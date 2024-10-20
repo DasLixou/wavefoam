@@ -113,43 +113,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
-name = "bikeshedwaveform"
-version = "0.1.0"
-dependencies = [
- "bikeshedwaveform_core",
- "bikeshedwaveform_iced",
- "bikeshedwaveform_wgpu",
-]
-
-[[package]]
-name = "bikeshedwaveform_core"
-version = "0.1.0"
-dependencies = [
- "bytemuck",
-]
-
-[[package]]
-name = "bikeshedwaveform_iced"
-version = "0.1.0"
-dependencies = [
- "bikeshedwaveform_core",
- "bikeshedwaveform_wgpu",
-]
-
-[[package]]
-name = "bikeshedwaveform_wgpu"
-version = "0.1.0"
-dependencies = [
- "bikeshedwaveform_core",
- "bytemuck",
- "hound",
- "itertools",
- "pollster",
- "wgpu",
- "winit",
-]
-
-[[package]]
 name = "bit-set"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1690,6 +1653,34 @@ name = "wasm-bindgen-shared"
 version = "0.2.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65fc09f10666a9f147042251e0dda9c18f166ff7de300607007e96bdebc1068d"
+
+[[package]]
+name = "wavefoam"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
+name = "wavefoam_iced"
+version = "0.1.0"
+dependencies = [
+ "wavefoam",
+ "wavefoam_wgpu",
+]
+
+[[package]]
+name = "wavefoam_wgpu"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "hound",
+ "itertools",
+ "pollster",
+ "wavefoam",
+ "wgpu",
+ "winit",
+]
 
 [[package]]
 name = "wayland-backend"

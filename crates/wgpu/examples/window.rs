@@ -1,7 +1,7 @@
 use std::{error::Error, sync::Arc};
 
-use bikeshedwaveform_wgpu::peak_texture::PeakTexture;
 use hound::{SampleFormat, WavReader};
+use wavefoam_wgpu::peak_texture::PeakTexture;
 use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
     BlendState, Color, ColorWrites, MultisampleState, PipelineCompilationOptions,
@@ -80,7 +80,7 @@ impl ApplicationHandler for App<'_> {
         };
         let window = cached_window.take().unwrap_or_else(|| {
             let window = Window::default_attributes()
-                .with_title("bikeshedwaveform_wgpu example")
+                .with_title("wavefoam_wgpu example")
                 .with_resizable(true)
                 .with_inner_size(LogicalSize::new(800, 200));
             Arc::new(event_loop.create_window(window).unwrap())
@@ -201,7 +201,7 @@ impl ApplicationHandler for App<'_> {
         });
 
         let shader = device.create_shader_module(ShaderModuleDescriptor {
-            label: Some("Basic bikeshedwaveform Shader"),
+            label: Some("Basic wavefoam Shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("../src/basic.wgsl").into()),
         });
 

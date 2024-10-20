@@ -3,15 +3,12 @@ members = ["crates/*"]
 resolver = "2"
 
 [package]
-name = "bikeshedwaveform"
+name = "wavefoam"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bikeshedwaveform_core = { path = "crates/core" }
-bikeshedwaveform_iced = { path = "crates/iced", optional = true }
-bikeshedwaveform_wgpu = { path = "crates/wgpu", optional = true }
+bytemuck = { version = "1.19.0", features = ["derive"], optional = true }
 
 [features]
-iced = ["dep:bikeshedwaveform_iced", "wgpu"]
-wgpu = ["dep:bikeshedwaveform_wgpu"]
+bytemuck = ["dep:bytemuck"]

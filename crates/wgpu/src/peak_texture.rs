@@ -1,5 +1,5 @@
-use bikeshedwaveform_core::peaks::Peak;
 use itertools::Itertools;
+use wavefoam::peaks::Peak;
 use wgpu::{Extent3d, Queue, Texture, TextureDescriptor, TextureFormat, TextureUsages};
 
 pub struct PeakTexture {

@@ -1,10 +1,10 @@
 [package]
-name = "bikeshedwaveform_wgpu"
+name = "wavefoam_wgpu"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bikeshedwaveform_core = { path = "../core", features = ["bytemuck"] }
+wavefoam = { path = "../../", features = ["bytemuck"] }
 itertools = "0.13.0"
 wgpu = "22.1.0"
 bytemuck = { version = "1.19.0", features = ["derive"] }
