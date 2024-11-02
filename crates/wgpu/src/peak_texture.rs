@@ -1,31 +1,22 @@
-use itertools::Itertools;
-use wavefoam::peaks::Peak;
+use wavefoam::scan::PeakScan;
 use wgpu::{Extent3d, Queue, Texture, TextureDescriptor, TextureFormat, TextureUsages};
 
-pub struct PeakTexture {
-    data: Box<[Peak]>,
+pub struct PeakTexture<'s> {
+    scan: &'s PeakScan,
 }
 
-impl PeakTexture {
+impl<'s> From<&'s PeakScan> for PeakTexture<'s> {
+    fn from(value: &'s PeakScan) -> Self {
+        Self { scan: value }
+    }
+}
+
+impl PeakTexture<'_> {
     const FORMAT: TextureFormat = TextureFormat::Rg32Float; // TODO: do we just want 16-bit? Should user be able to decide?
-
-    pub fn from_iter(iter: impl Itertools<Item = f32>, chunk_size: usize) -> Self {
-        Self::from_chunks(
-            iter.chunks(chunk_size)
-                .into_iter()
-                .map(|chunk| Peak::from_iter(chunk).unwrap_or_default()),
-        )
-    }
-
-    pub fn from_chunks(iter: impl Iterator<Item = Peak>) -> Self {
-        Self {
-            data: iter.collect(),
-        }
-    }
 
     pub fn texture_size(&self) -> Extent3d {
         Extent3d {
-            width: self.data.len() as u32,
+            width: self.scan.resolution() as u32,
             height: 1,
             depth_or_array_layers: 1,
         }
@@ -52,10 +43,10 @@ impl PeakTexture {
                 origin: wgpu::Origin3d::ZERO,
                 aspect: wgpu::TextureAspect::All,
             },
-            bytemuck::cast_slice(&self.data),
+            bytemuck::cast_slice(&self.scan.peaks()),
             wgpu::ImageDataLayout {
                 offset: 0,
-                bytes_per_row: Some(8 * self.data.len() as u32),
+                bytes_per_row: Some(8 * self.scan.peaks().len() as u32),
                 rows_per_image: None,
             },
             self.texture_size(),

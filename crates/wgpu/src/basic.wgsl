@@ -22,12 +22,10 @@ fn vs_main(
 var tex: texture_1d<f32>;
 @group(0) @binding(1)
 var smplr: sampler;
-@group(0) @binding(2)
-var<uniform> resolution: u32;
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    let texel_size = 1.0 / f32(resolution);
+    let texel_size = 1.0 / f32(textureDimensions(tex));
 
     let fragment_size = abs(dpdxFine(in.uv.x));
 

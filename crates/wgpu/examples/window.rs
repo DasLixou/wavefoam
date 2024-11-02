@@ -1,6 +1,7 @@
 use std::{error::Error, sync::Arc};
 
 use hound::{SampleFormat, WavReader};
+use wavefoam::scan::PeakScan;
 use wavefoam_wgpu::peak_texture::PeakTexture;
 use wgpu::{
     util::{BufferInitDescriptor, DeviceExt},
@@ -125,8 +126,9 @@ impl ApplicationHandler for App<'_> {
         let sample = include_bytes!("guitar.wav");
         let wav_reader = WavReader::new(sample.as_slice()).unwrap();
         assert_eq!(wav_reader.spec().sample_format, SampleFormat::Float);
-        let peak_texture =
-            PeakTexture::from_iter(wav_reader.into_samples::<f32>().map(Result::unwrap), 256);
+        let peak_scan =
+            PeakScan::from_iter(wav_reader.into_samples::<f32>().map(Result::unwrap), 256);
+        let peak_texture = PeakTexture::from(&peak_scan);
         let tex = device.create_texture(&peak_texture.texture_descriptor());
         peak_texture.queue_texture_write(&queue, &tex);
         let tex_view = tex.create_view(&wgpu::TextureViewDescriptor::default());
@@ -138,12 +140,6 @@ impl ApplicationHandler for App<'_> {
             min_filter: wgpu::FilterMode::Nearest,
             mipmap_filter: wgpu::FilterMode::Nearest,
             ..Default::default()
-        });
-
-        let resolution_buffer = device.create_buffer_init(&BufferInitDescriptor {
-            label: Some("Wavefoam Texture Resolution"),
-            contents: bytemuck::cast_slice(&[peak_texture.texture_size().width]),
-            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
         });
 
         let peak_bind_group_layout =
@@ -167,16 +163,6 @@ impl ApplicationHandler for App<'_> {
                         ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::NonFiltering),
                         count: None,
                     },
-                    wgpu::BindGroupLayoutEntry {
-                        binding: 2,
-                        visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Buffer {
-                            ty: wgpu::BufferBindingType::Uniform,
-                            has_dynamic_offset: false,
-                            min_binding_size: None,
-                        },
-                        count: None,
-                    },
                 ],
                 label: Some("texture_bind_group_layout"),
             });
@@ -192,10 +178,6 @@ impl ApplicationHandler for App<'_> {
                 wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::Sampler(&sampler),
-                },
-                wgpu::BindGroupEntry {
-                    binding: 2,
-                    resource: resolution_buffer.as_entire_binding(),
                 },
             ],
         });
@@ -268,7 +250,6 @@ impl ApplicationHandler for App<'_> {
             render_pipeline,
             vertex_buffer,
             index_buffer,
-            resolution_buffer,
             peak_bind_group,
             window,
         })
@@ -358,7 +339,6 @@ struct ActiveRenderState<'a> {
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
     index_buffer: wgpu::Buffer,
-    resolution_buffer: wgpu::Buffer,
     peak_bind_group: wgpu::BindGroup,
     window: Arc<Window>,
 }

@@ -1659,6 +1659,7 @@ name = "wavefoam"
 version = "0.1.0"
 dependencies = [
  "bytemuck",
+ "itertools",
 ]
 
 [[package]]
@@ -1675,7 +1676,6 @@ version = "0.1.0"
 dependencies = [
  "bytemuck",
  "hound",
- "itertools",
  "pollster",
  "wavefoam",
  "wgpu",

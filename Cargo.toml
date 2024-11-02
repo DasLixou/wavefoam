@@ -9,6 +9,7 @@ edition = "2021"
 
 [dependencies]
 bytemuck = { version = "1.19.0", features = ["derive"], optional = true }
+itertools = "0.13.0"
 
 [features]
 bytemuck = ["dep:bytemuck"]
