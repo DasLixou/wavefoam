@@ -14,7 +14,7 @@ pub fn make_runtime_effect() -> Result<RuntimeEffect, String> {
         float min_peak = peaks.eval(float2(coord.x, 0)).x;
         float max_peak = peaks.eval(float2(coord.x, 2)).x;
         
-        float v = coord.y / 2;
+        float v = coord.y;
         return (v < max_peak && v > min_peak) ? color.rgb1 : half4(0.0, 0.0, 0.0, 0.0);
     }
     "#,
@@ -38,8 +38,8 @@ pub fn make_shader(effect: &RuntimeEffect, peak_image: &Image, color: V4) -> Opt
 pub fn make_scan_image(scan: &PeakScan) -> Option<Image> {
     let mut data = vec![0u8; scan.resolution() * 2];
     for (i, peak) in scan.peaks().iter().enumerate() {
-        let min: u8 = ((peak.min + 0.5) * 128.) as u8;
-        let max: u8 = ((peak.max + 0.5) * 128.) as u8;
+        let min: u8 = ((peak.min + 1.0) * 128.) as u8;
+        let max: u8 = ((peak.max + 1.0) * 128.) as u8;
         data[i] = min;
         data[i + scan.resolution()] = max;
     }
