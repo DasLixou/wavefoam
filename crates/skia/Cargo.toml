@@ -1,0 +1,12 @@
+[package]
+name = "wavefoam_skia"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wavefoam = { path = "../../", features = ["bytemuck"] }
+bytemuck = { version = "1.19.0", features = ["derive"] }
+skia-safe = "0.78.2"
+
+[dev-dependencies]
+hound = "3.5.1"
