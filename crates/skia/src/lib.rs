@@ -14,7 +14,7 @@ pub fn make_runtime_effect() -> Result<RuntimeEffect, String> {
         float min_peak = peaks.eval(float2(coord.x, 0)).x;
         float max_peak = peaks.eval(float2(coord.x, 2)).x;
         
-        float v = coord.y;
+        float v = 1 - coord.y;
         return (v < max_peak && v > min_peak) ? color.rgb1 : half4(0.0, 0.0, 0.0, 0.0);
     }
     "#,
