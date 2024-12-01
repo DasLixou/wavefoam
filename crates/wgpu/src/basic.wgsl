@@ -40,7 +40,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
         texel_pos += texel_size;
     }
 
-    let v = in.uv.y - 0.5;
+    let v = (in.uv.y * 2) - 1;
     if v < peak.y && v > peak.x {
         return vec4<f32>(0.5, 0.6, 0.8, 1.0);
     } else {
